@@ -44,8 +44,8 @@ function proml {
 
   local     	DEFAULT="\[\033[0m\]"
 
-PS1="$GREEN[\t]$YELLOW[\u@\h] $LIGHT_RED\$(parse_git_branch)
-$LIGHT_YELLOW\w $DEFAULT$ "
+PS1="$GREEN[\t]$YELLOW[\u@\h] $YELLOW\$(parse_git_branch)
+$DEFAULT\w $ "
 
 PS2='> '
 
@@ -54,3 +54,5 @@ PS4='+ '
 }
 
 proml
+
+export LS_COLORS=$(echo $LS_COLORS | sed "s/di=[0-9][0-9];[0-9][0-9]:/di=00;31:/g")
