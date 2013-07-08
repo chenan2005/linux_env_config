@@ -82,7 +82,7 @@ do
 	then
 		if [[ -e $file_name ]] 
 		then
-			git difftool $merge_source $file_name
+			git difftool $merge_source $file_name -y
 		else
 			echo "info : checkout $file_name from $merge_source..."
 			git checkout $merge_source $file_name
