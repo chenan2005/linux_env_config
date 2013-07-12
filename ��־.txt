@@ -1,0 +1,1786 @@
+Ubuntu 9.10 Server On VMWare WorkStation 6.5
+
+//增加语系
+vim /var/lib/locales/supported.d/local
+locale-gen
+
+//设置控制台语言环境 
+vim /etc/default/locale
+
+//安装telnet服务
+apt-get install xinetd telnetd
+
+//停止telnet服务
+vi /etc/inetd.conf
+reboot
+
+//安装ssh服务
+apt-get install openssh-server
+apt-get update	//更新可用软件信息
+apt-get upgrade	//升级软件
+apt-get dist-upgrade	//升级系统到最新
+
+
+//ubuntu搜索软件
+apt-cache search string
+apt-cache showpkg pkg
+apt-cache dumpavail		//打印可用软件包列表
+
+aptitude 用法应该和apt-get差不多，信息更详细
+
+dpkg -L package	看软件包可用文档
+
+
+//安装vmware-tools
+mount /dev/cdrom /mnt/cdrom
+cd /tmp
+tar -xf /mnt/cdrom/vmtools*.tar.gz
+./vm-tools-distrib/vmware-install.plroot
+
+//vm-tools
+
+//安装gcc
+apt-get install gcc
+
+//vmware mount hgfs
+mount -o ttl=5 -t vmhgfs .host:/ /mnt/hgfs
+
+//unmount
+umount devname|dir
+
+//查看ip地址
+ifconfig
+
+//ubuntu全局配置文件
+系统初始化
+
+/etc/timezone 时区
+/etc/inetd.conf 超级进程
+
+文件系统
+
+/etc/fstab 开机时挂载的文件系统
+/etc/mtab 当前挂载的文件系统
+
+用户系统
+
+/etc/passwd 用户信息
+/etc/shadow 用户密码
+/etc/group 群组信息
+/etc/gshadow 群组密码
+/etc/sudoers Sudoer列表（请使用“visudo”命令修改此文件，而不要直接编辑）
+
+Shell
+
+/etc/shell 可用Shell列表
+/etc/inputrc ReadLine控件设定
+/etc/profile 用户首选项
+/etc/bash.bashrc bash配置文件
+
+系统环境
+
+/etc/environment 环境变量
+/etc/updatedb.conf 文件检索数据库配置信息
+/etc/issue 发行信息
+/etc/issue.net
+/etc/screenrc 屏幕设定
+
+网络
+/etc/iftab 网卡MAC地址绑定
+/etc/hosts 主机列表
+/etc/hostname 主机名
+/etc/resolv.conf 域名解析服务器地址
+/etc/network/interfaces 网卡配置文件
+
+//重启网络
+/etc/init.d/networking restart
+或
+ifdown eth0
+ifup eth0
+
+//重启mysql服务
+/etc/init.d/mysql restart
+
+via 来自Ubuntu部落的教程
+
+用DD命令生成引导文件方法:
+dd if=/dev/hdax of=/mnt/fat32/bootsect.lnx bs=512 count=1 并口硬盘
+dd if=/dev/sdax of=/mnt/fat32/bootsect.lnx bs=512 count=1 串口硬盘
+命令解释:
+hdax/sdax上面已经解释过了~~~~生成的引导文件名字就是bootsect.lnx
+弄好之后进入Windows把生成的引导文件COPY进C盘,在boot.ini加C:\bootsect.lnx="Ubuntu",OK!
+
+
+
+///-----------------about mysql-----------
+//卸载test数据库
+mysqladmin -u root drop test   
+
+//启动mysql命令行工具
+mysql -uroot -p （空密码时省略-p参数）
+
+//设置mysql root用户密码
+mysqladmin -uroot --passward=<old password> password=<new password> 
+
+//允许外来访问
+grant all privileges on <dbname>.* to <username>@<hostname>("%"for all outcoming host) identified by <password>;
+vi /etc/mysql/my.conf (chang to not skip networking)
+
+
+
+///-----------------实验日志-----------------------------
+//in ubuntu
+create database chenan;
+grant all privileges on chenan.* to chenan@"%" identified by "5689";
+
+//in win7:
+use workbench to create chenan.table1 and syc to database chenan
+
+
+//----tommorow to do
+install appach server and php and let it work
+(参考临时收藏夹相关文章)
+
+
+//---------------------------------
+2010.3.19  配置mysql+apache2+php5
+参考：http://www.howtoforge.com/installing-apache2-with-php5-and-mysql-support-on-ubuntu-9.10-lamp
+advaced:http://www.silentstreet.net/archives/ubuntu-9-04-compile-install-apache-2-2-12-mysql-5-1-37-php5-2-10/
+---------------------
+apt-get install apache2
+The following extra packages will be installed:
+  apache2-mpm-worker apache2-utils apache2.2-bin apache2.2-common libapr1
+  libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap ssl-cert
+Suggested packages:
+  apache2-doc apache2-suexec apache2-suexec-custom
+The following NEW packages will be installed:
+  apache2 apache2-mpm-worker apache2-utils apache2.2-bin apache2.2-common
+  libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap ssl-cert
+0 upgraded, 10 newly installed, 0 to remove and 55 not upgraded.
+------------------
+apt-get install php5
+The following extra packages will be installed:
+  apache2-mpm-prefork libapache2-mod-php5 php5-common
+Suggested packages:
+  php-pear php5-suhosin
+The following packages will be REMOVED:
+  apache2-mpm-worker
+The following NEW packages will be installed:
+  apache2-mpm-prefork libapache2-mod-php5 php5 php5-common
+------------------
+aptitude install php5-mysql
+aptitude install php5-gd
+/etc/init.d/apache2 restart
+------------------
+apt-get install phpmyadmin
+(Web server to reconfigure automatically: <-- apache2)
+(Configure database for phpmyadmin with dbconfig-common? <-- No )
+------------------
+------------------
+------------------
+------------------
+//
+
+//---------------------------------
+2010.3.22
+
+//win7 64的注册表。32位的软件入口一般在HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node下面
+
+//看网络情况
+1.wireshark 抓包工具，看看哪个端口流量比较大
+2.netstat -ano 看看打开端口的pid
+3.任务管理器，查看pid对应的进程
+
+
+//2010.4.7 学习bash
+echo $UID   （显示当前用户ID，root为0）
+单引号可以用来引用命令的结果字符串，如'pwd'相当于引用当前路径（也可以用"$PWD"变量引用当前路径）
+|管道操作符（降上一命令的输入作为下一命令的输出）
+|| “或”操作符，连接两个命令时，其语义是如果第一个命令返回错误才执行第二个命令
+chmod 555 scriptname (允许任何人都具有 可读和执行权限)
+chmod +rx scriptname (允许任何人都具有 可读和执行权限) 
+chmod u+rx scriptname (只给脚本的所有者 可读和执行权限)
+
+chmod [选项] [who][+|-|=] [mode] 文件名
+who：
+	u 表示“用户（user）”，即文件或目录的所有者。
+　g 表示“同组（group）用户”，即与文件属主有相同组ID的所有用户。
+　o 表示“其他（others）用户”。
+　a 表示“所有（all）用户”。它是系统默认值。
+
+mode:
+	r 可读。
+　w 可写。
+　x 可执行
+	X 只有目标文件对某些用户是可执行的或该目标文件是目录时才追加x 属性。
+	u 与文件属主拥有一样的权限。
+	g 与和文件属主同组的用户拥有一样的权限。
+	o 与其他用户拥有一样的权限。
+	
+	s 在文件执行时把进程的属主或组ID置为该文件的文件属主。//特殊权限，设置在用户或者用户组上，注意安全性
+	t	所有用户得到全部权限。	//通常在/tmp或/var/tmp上设置，在“其他（others）用户”上设置
+
+//2010.4.29 gcc学习
+gcc -pg -o xxx xxx.c
+gprof xxx	(使用gprof查看程序中函数的调用次数、时间等,需要编译时加入-pg选项)
+gcc -c xxx.c //生成xxx.o中间文件
+
+-------------------------------- 
+--2010.7.6 mysql cluster
+sudo apt-get install g++
+
+编译
+//重置configure
+# autoreconf –force –install
+# libtoolize –automake –force
+# automake –force –add-missing
+
+CFLAGS="-O3 -fomit-frame-pointer" CXX=gcc CXXFLAGS="-O3 -felide-constructors \
+       -fno-exceptions -fno-rtti -fomit-frame-pointer" \
+       ./configure --prefix=/home/mysql/mysql-cluster-7.1.5 \
+       --enable-assembler \
+       --disable-shared \
+       --without-debug \
+       --without-embedded-server \
+       --with-mysqld-user=mysql \
+       --with-charset=utf8 \
+       --with-collation=utf8_general_ci \
+       --with-extra-charsets=all \
+       --with-mysqld-ldflags=-all-static \
+       --with-client-ldflags=-all-static \
+       --with-gnu-ld \
+       --with-fast-mutexes \
+       --with-pthread \
+       --with-atomic-ops=rwlocks \
+       --with-unix-socket-path=/tmp/mysql.sock \
+       --with-plugins=myisam,ndbcluster,innobase,partition
+       //,archive,federated,heap
+       //--with-plugins=all
+       //--with-named-curses-libs=/usr/lib/libncurses.so.5 \
+
+export CFLAGS="-O3"
+export CXX=gcc
+export CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti -fomit-frame-pointer -ffixed-ebp"
+./configure --prefix=/usr/local/mysql --localstatedir=/home/db/mysql --sysconfdir=/etc \
+--disable-shared --enable-assembler --disable-profiling \
+--with-charset=utf8 --with-collation=utf8_general_ci --with-extra-charsets=all \
+--with-gnu-ld --with-pthread --with-fast-mutexes --with-atomic-ops=rwlocks \
+--with-mysqld-ldflags=-all-static --with-client-ldflags=-all-static --with-mysqld-user=mysql \
+--without-debug --without-embedded-server \
+--with-unix-socket-path=/usr/local/mysql/sock/mysql.sock \
+--with-plugins=partition,archive,federated,heap,innobase,myisam,ndbcluster
+
+sudo make
+sudo make install
+sudo cp support-files/my-huge.cnf /etc/my.cnf
+vi /etc/my.cnf
+	添加：datadir=/db/mysql
+				skip-name-resolv
+				table-cache=4096
+sudo mkdir -p /db/mysql
+sudo chown mysql.mysql /db/mysql -R
+sudo ./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql
+拷贝mysql.server为/etc/init.d/mysqld
+sudo update-rc.d mysqld defaults(一般linux用chkconfig --level 235 mysqld on)
+chkconfig -list mysqld
+
+sudo chown -R root.mysql /usr/local/mysql
+sudo vi /etc/profile  添加环境变量PATH=$PATH:/usr/local/mysql/bin
+sudo . /etc/profile
+
+编辑my.cnf添加basedir以及：
+	[mysqld]
+	ndbcluster
+	ndb-connectstring = 127.0.0.1
+	
+	[mysql_cluster]
+	ndb-connectstring = 127.0.0.1
+	
+sudo service mysqld start
+mkdir mysql-cluster
+sudo touch config.ini
+  config.ini内容：
+  [NDBD DEFAULT]
+	NoOfReplicas=1
+	#DataMemory=200M
+  #IndexMemory=100M
+  DataMemory=100M
+  IndexMemory=50M
+  
+  [TCP DEFAULT]
+  portnumber=2202
+  
+  [NDB_MGMD]
+  id=1
+  hostname=127.0.0.1
+  datadir=/db/mysql-cluster
+  
+  [NDBD]
+  id=2
+  hostname=127.0.0.1
+  datadir=/db/mysql
+  
+  [MYSQLD]
+  hostname=127.0.0.1
+  [MYSQLD]
+
+sudo /usr/local/mysql/libexec/ndb_mgmd -f /db/mysql-cluster/config.ini
+sudo /usr/local/mysql/libexec/ndbd --initial --ndb-connectstring=127.0.0.1:1186
+sudo /etc/init.d/mysqld restart
+-------------------------------------------------------------------------
+
+php5 windows (for iis) php.ini with fastcgi
+	cgi.force_redirect = 0	
+	cgi.fix_pathinfo=1
+	fastcgi.impersonate = 1;
+	fastcgi.logging = 0
+	
+	extension_dir = "ext"
+	doc_root = "D:/wwwroot"
+	添加php路径到path
+
+php5 windows (for apache) php.ini
+	extension_dir = "ext"
+	doc_root = "D:/wwwroot"
+	添加php路径到path
+	
+apache 2.26 windows with php5
+	LoadModule php5_module C:/php/php5apache2_2.dll
+	ServerName 127.0.0.1:80
+	DocumentRoot "D:/wwwroot"
+	AddType application/x-httpd-php .php
+	<Directory "D:/wwwroot">
+	...
+	</Directory>
+		
+	PhpIniDir "C:/php"
+	
+	
+-------------------------------------------------------------------------
+mysql windows 编译
+cd workdir
+win\configure.js WITH_NDBCLUSTER_STORAGE_ENGINE
+win\build-vs8.bat
+
+
+-------------------------------------------------------------------------
+mysql 备份
+mysqldump [OPTIONS] database [tables]
+mysqldump [OPTIONS] --all-databases [OPTIONS]
+mysqldump [OPTIONS] --databases [OPTIONS] DB1 [DB2 DB3...]
+mysqldump -uroot -F --hex-blob -x --dump-date -B --default-character-set=utf8 databasename > databasename.mysql.dump
+-n:   --no-create-db
+-d:   --no-data
+-t:   --no-create-info
+-R:   --routines      Dump stored routines (functions and procedures)
+-B：  --databases
+-x：  --lock-all-tables
+-F：  --flush-logs    Flush logs file in server before starting dump
+--ignore-table=database.table
+
+mysql 恢复
+mysql -uroot XFIRE < XFIRE.mysql.dump
+或在mysql console执行
+SOURCE XFIRE.mysql.dump;
+
+-------------------------------------------------------------------------
+查看版本信息
+lsb_release -a
+cat /proc/version
+-------------------------------------------------------------------------
+查看硬件信息
+cat /proc/cpuinfo
+cat /proc/meminfo or free
+-------------------------------------------------------------------------
+解压
+tar -xf tarfile
+unzip zipfile
+-------------------------------------------------------------------------
+压缩
+tar -cf targetfile totardir(file)
+
+-------------------------------------------------------------------------
+centos 从网络（centos.ustc.edu.cn）获取最新的CentOS-Base.repo
+cd /etc/yum.repos.d
+mv CentOS-Base.repo  CentOS-Base.repo.save
+wget http://centos.ustc.edu.cn/CentOS-Base.repo.5
+mv CentOS-Base.repo.5 CentOS-Base.repo
+
+-------------------------------------------------------------------------
+sql语句实例
+
+create table test1 (
+	id int(10) unsigned not null primary key, 
+	name char(64) not null, 
+	money int(15) unsigned not null,
+	key (name));
+	
+alter table test1 add key (name);
+
+alter table test1 modify id int(10) unsigned not null auto_increment;
+
+show columns from test1;
+
+show index from test1;
+
+alter table test1 drop index <index_name>;
+
+-------------------------------------------------------------------------
+关于innodb设置
+# Uncomment the following if you are using InnoDB tables
+#innodb_data_home_dir = /home/mysql/mysql-cluster-7.1.5/var/
+#innodb_data_file_path = ibdata1:10M:autoextend
+#innodb_log_group_home_dir = /home/mysql/mysql-cluster-7.1.5/var/
+# You can set .._buffer_pool_size up to 50 - 80 %
+# of RAM but beware of setting memory usage too high
+#innodb_buffer_pool_size = 16M
+#如果只用innodb的专用数据库服务器，可以设置到内存的70-80%
+innodb_buffer_pool_size = 512M
+#innodb_additional_mem_pool_size = 2M
+innodb_additional_mem_pool_size = 20M
+# Set .._log_file_size to 25 % of buffer pool size
+#innodb_log_file_size = 5M
+#大的日志文件性能好，但是恢复慢
+innodb_log_file_size = 64M
+#innodb_log_buffer_size = 8M
+#日志是每秒flush一次，缓存不需要太大
+innodb_log_buffer_size = 16M
+#innodb_flush_log_at_trx_commit = 1
+#1:每次操作都写日志并flush，2：写入系统缓存，仍然每秒flush，0：最快，安全性不够
+innodb_flush_log_at_trx_commit = 2
+#innodb_lock_wait_timeout = 50
+
+-------------------------------------------------------------------------
+vim的设置
+set nu						"显示行号
+set autoindent		"自动缩进
+set cindent				"c语言自动缩进
+set tabstop=4			"tab字符数=4
+set softtabstop=4	"软tab字符数
+set shiftwidth=4	"缩进空格数
+syntax on					"自动语法高亮
+
+
+-------------------------------------------------------------------------
+TAB替换为空格：
+:set ts=4
+:set expandtab
+:%retab!
+
+空格替换为TAB：
+:set ts=4
+:set noexpandtab
+:%retab!
+
+-------------------------------------------------------------------------
+export TERM = xterm-color	使终端设备支持语法高亮显示
+
+-------------------------------------------------------------------------
+比较文件（夹）
+diff -u file1 file2	> file2.diff		
+diff -rNu dir1 dir2	> dir2.diff //-r递归目录，-N处理新建或删除的文件，-u统一格式创建补丁文件，这种格式比缺省格式更紧凑些
+
+-------------------------------------------------------------------------
+patch命令
+patch -p0 < file2.diff	//在file1目录下执行
+patch -RE -p0 < file2.diff	//在file2目录下执行， -R反向补丁，即恢复到file1，-E发现空文件就删除
+patch -E -p1 < dir2.diff
+
+-------------------------------------------------------------------------
+vim指令
+
+yny 复制n行
+yy 复制当前行
+yw 复制当前单词
+"ayny  复制到a缓冲区(a可以为其他字母)
+"ap	粘贴a缓冲区的内容(a可以为其他字母)
+
+y改成d就是剪切了
+
+0 行首		$ 行末		（ 行首第一个字符
+
+mx   `x		标签和跳转标签
+
+:n1,n2 co n3	n1到n2行内容复制到n3行位置
+:`a,`b co `c	标签1到标签2内容复制到标签3位置
+co(copy)改成mo(move)就是move内容了
+
+v  选择模式
+u	 撤销操作		. 重复上一次操作      ctrl + r 恢复撤销
+ctrl + v 列选择模式
+~切换大小写	u到小写 U到大写
+
+% 跳转到配对的括号去
+[[ 跳转到代码块的开头去(但要求代码块中'{'必须单独占一行)
+gD 跳转到局部变量的定义处
+'' 跳转到光标上次停靠的地方, 是两个', 而不是一个"
+> 增加缩进,"x>"表示增加以下x行的缩进 
+< 减少缩进,"x<"表示减少以下x行的缩进   
+
+:n1,n2 w filename 将当前编辑文件的n1--n2行内容存入filename
+:r filename		将filename内容粘贴到当前编辑文件光标处
+
+o 在光标的下方打开新的一行并进入插入模式。
+O 在光标的上方打开新的一行并进入插入模式。
+
+:s/str1/str2[/g]	把当前行第一个str1替换为str2，/g替换当前行所有的str1
+:#,#s/str1/str2[/g]	替换行号之间的内容
+:%s/str1/str2[/g[c]]	替换全文件内容，c选项在替换的时候提示
+
+:set ic   (搜索时忽略大小写 ignorecase)
+或者搜索时加\c
+/searchword\c
+:set noic   (搜索时不忽略大小写 ignorecase)
+
+qa 记录命令到a缓存（a可以是其他字母），再按q结束记录
+@a 调用a缓存中记录的命令
+
+ctrl+w,s	分屏
+ctrl+w,v	纵向分屏
+ctrl+w,o	关闭其他
+ctrl+w,h
+ctrl+w,j
+ctrl+w,k
+ctrl+w,l	切换焦点
+-------------------------------------------------------------------------
+ctags生成
+ctags -R --languages=c,c++ --langmap=c++:+.inl -h +.inl --c++-kinds=+px --fields=+aiKSz --extra=+fq [--exclude=lex.yy.cc --exclude=copy_lex.yy.cc] [-f tagfile scandir1 scandir2 ...]
+详情http://blog.csdn.net/alexdboy/archive/2009/02/09/3871707.aspx
+http://easwy.com/blog/archives/exuberant-ctags-chinese-manual/
+
+使用ctrl+]跳转到光标所在符号定义，ctrl+t返回
+
+在vi中：
+:ctags -R
+刷新当前tags
+-------------------------------------------------------------------------
+系统头文件ctags生成和加入
+ctags -R --languages=c,c++ --langmap=c++:+.inl -h +.inl --c++-kinds=+px --fields=+aiKSz --extra=+fq -I __THROW -f ~/.vim/systags /usr/include /usr/local/include
+修改~/.vimrc，将系统头文件tags加入
+set tags+=~/.vim/systags
+
+-------------------------------------------------------------------------
+winmanager使用
+修改.vimrc
+let g:winManagerWindowLayout='FileExplorer|TagList'
+nmap wm :WMToggle<cr>
+vi中normal模式输入wm启动。
+
+-------------------------------------------------------------------------
+其他插件使用
+a.vim	minibufexpl.vim
+
+getconf GNU_LIBPTHREAD_VERSION
+ 
+-------------------------------------------------------------------------
+c# 导入winapi函数
+  [DllImport("user32.dll ")]
+  public static extern IntPtr FindWindow(string className, string appTitle);
+  [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+  private static extern IntPtr GetForegroundWindow();   //WINAPI 获取当前活动窗体的句柄
+  [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+  private static extern bool SetForegroundWindow(IntPtr hWnd); //WINAPI 设置当前活动窗体的句柄
+  
+-------------------------------------------------------------------------
+lsof -p pid		查看进程打开的文件句柄 
+
+ps ax   ：tty值为“？”是守护进程，叫deamon 无终端，大多系统服务是此进程，内核态进程是看不到的，例木马 
+ps axf  ：看进程树，以树形方式现实进程列表敲 ，init是1号进程，系统所有进程都是它派生的，杀不掉 
+ps axm ：会把线程列出来。在linux下进程和线程是统一的，是轻量级进程的两种方式。 
+ps axu ：显示进程的详细状态。 
+      vsz：说此进程一共占用了多大物理内存。 
+      rss：请求常驻内存多少 
+
+-------------------------------------------------------------------------
+数据类型	char	short	_int32	int 	long 	long long  	pointer  
+ LP32        8       16       N/A   16       32       N/A         32      		
+ LP64	     8       16       N/A   32       64       N/A         64      		(Linux64)
+ ILP32       8       16       N/A   32       32       N/A         32      		(Windows32)
+ ILP64       8       16       32    64       64       N/A         64      
+ LLP64       8       16       N/A   32       32       64          64      		(Windows64)			
+
+-------------------------------------------------------------------------
+正则表达式
+
+$ 匹配行结束符。例如正则表达式weasel$ 能够匹配字符串"He's a weasel"的末尾 　　但是不能匹配字符串"They are a bunch of weasels." 
+^ 匹配一行的开始。例如正则表达式^When in能够匹配字符串"When in the course of human events"的开始，但是不能匹配"What and When in the" 
+\< \> 匹配词（word）的开始（\<）和结束（\>）。例如正则表达式\<the\>能够匹配字符串"for the wise"中的"the"，但是不能匹配字符串"otherwise"中的"the"。注意：这个元字符不是所有的软件都支持的。 
+
+.点  匹配任何单个字符。例如正则表达式r.t匹配这些字符串：rat、rut、r t，但是不匹配root。  
+[ ] 　　[c1-c2] 　　[^c1-c2] 匹配括号中的任何一个字符。例如正则表达式r[aou]t匹配rat、rot和rut，但是不匹配ret。可以在括号中使用连字符-来指定字符的区间，例如正则表达式[0-9]可以匹配任何数字字符；还可以制定多个区间，例如正则表达式[A-Za-z]可以匹配任何大小写字母。另一个重要的用法是“排除”，要想匹配除了指定区间之外的字符——也就是所谓的补集——在左边的括号和第一个字符之间使用^字符，例如正则表达式[^269A-Z] 将匹配除了2、6、9和所有大写字母之外的任何字符。 
+
+? 匹配0或1个正好在它之前的那个字符。注意：这个元字符不是所有的软件都支持的。 
++ (grep -E或egrep)匹配1或多个正好在它之前的那个字符。例如正则表达式9+匹配9、99、999等。注意：这个元字符不是所有的软件都支持的。 
+* 匹配0或多个正好在它之前的那个字符。例如正则表达式.*意味着能够匹配任意数量的任何字符。 
+\{i\} 　　\{i,j\} 匹配指定数目的字符，这些字符是在它之前的表达式定义的。例如正则表达式A[0-9]\{3\} 能够匹配字符"A"后面跟着正好3个数字字符的串，例如A123、A348等，但是不匹配A1234。而正则表达式[0-9]\{4,6\} 匹配连续的任意4个、5个或者6个数字字符。注意：这个元字符不是所有的软件都支持的。 
+
+| (grep -E或egrep)将两个匹配条件进行逻辑“或”（Or）运算。例如正则表达式(him|her) 匹配"it belongs to him"和"it belongs to her"，但是不能匹配"it belongs to them."。注意：这个元字符不是所有的软件都支持的。 
+
+\  这是引用符，用来将这里列出的这些元字符当作普通的字符来进行匹配。例如正则表达式\$被用来匹配美元符号，而不是行尾，类似的，正则表达式\.用来匹配点字符，而不是任何字符的通配符。 
+\( \) 将 \( 和 \) 之间的表达式定义为“组”（group），并且将匹配这个表达式的字符保存到一个临时区域（一个正则表达式中最多可以保存9个），它们可以用 \1 到\9 的符号来引用。 
+
+
+-------------------------------------------------------------------------
+root密码丢失后的恢复
+redhat 使用单用户模式登录修改密码(grub--->e--->kernal ... 启动项添加single（或1）参数)
+suse	1.启动参数添加init=/bin/bash    2.bash下执行mount -n / -o remount,rw    3.执行passwd修改密码
+
+-------------------------------------------------------------------------
+file查看文件类型，是否静态编译、是否strip过
+strings显示程序中的asicc字符串
+kill -SIGSEGV 进程号 会产生一个core文件，用strings可以看信息，用一个c程序可以重新构建它的可执行程序
+
+-------------------------------------------------------------------------
+2010.11.30系统被黑的处理
+1、备份数据	2、下载安装chkrootkit和rkhunter查看常用rootkit	3、rkhunter的日志里有一些rookit的特征文件，查看分析之		4、最好重装
+
+-------------------------------------------------------------------------
+login shell, interactive shell 释疑
+登录的时候是login shell，按顺序执行/etc/profile,~/.bash_profile,~/.bash_login, ~/.profile
+成功登陆后转化为interactive shell，执行~/.bashrc
+
+-------------------------------------------------------------------------
+linux安全设置   2010/12/1
+修改/etc/passwd，将常用的远程登录账号之外的账号的bash设置为/bin/false或/sbin/nologin
+
+-------------------------------------------------------------------------
+Unicode符号范围与UTF-8实现
+Unicode符号范围 		| 	UTF-8编码方式
+(十六进制) 					| （二进制）
+--------------------+---------------------------------------------
+0000 0000-0000 007F | 0xxxxxxx
+0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+文本文件开头是 EF BB BF 表示UTF-8编码
+FF FE 开头表示小头Unicoude			FE FF	开头表示大头Unicoude
+
+-------------------------------------------------------------------------
+中文字符集
+gb2312 简体字符集		gb12345	繁体字符集			gbk	简繁体字符集（兼容前两者）
+
+-------------------------------------------------------------------------
+关于linux语言环境
+locale -a		显示系统支持的字符集
+LANG	LC_*的默认值，是最低级别的设置，如果LC_*没有设置，则使用该值。类似于 LC_ALL
+
+-------------------------------------------------------------------------
+查看表的创建语句（字符集、引擎等）
+show create table Account00;
+
+-------------------------------------------------------------------------
+windows（vc）下编码转换
+	//从当前编码转换到unicode码
+		char szUCS2[256] = {0};
+		int iUCS_Length = MultiByteToWideChar(CP_THREAD_ACP, 0, "周日34其8斯蒂芬", (int)strlen("周日34其8斯蒂芬"), (LPWSTR)szUCS2, 128);
+		
+	//从unicode码转换到utf8存储方式
+		char szUTF8[256] = {0};
+		int iUTF8_Length = WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)szUCS2, iUCS_Length, szUTF8, 256, NULL, false);
+
+	//从utf8转换到unicode码
+		iUCS_Length = MultiByteToWideChar(CP_UTF8, 0, szUTF8, iUTF8_Length, (LPWSTR)szUCS2, 128);
+	
+	//从unicode转换到Ansi编码(ansi编码，windows下默认使用的可变长字节存储方式，兼容ascii和gb2312等)
+		char szMBCS[256] = {0};
+		int iMBCS_Length = WideCharToMultiByte(CP_ACP, 0, (LPWSTR)szUCS2, iUCS_Length, szMBCS, 256, NULL, false);
+		
+-------------------------------------------------------------------------
+mysql服务器的编码
+show variables like "character_set_%"		显示字符集
+show variables like "collation_%"	显示比较集
+set names "gbk"	设置客户端用于查询、结果的字符集(character_set_client、character_set_connection、character_set_result等)
+用c api连接服务器时，查询的sql语句的字符编码应与character_set_client等的设置一致
+
+
+-------------------------------------------------------------------------
+linux开关ping
+echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_all
+echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+-------------------------------------------------------------------------
+linux踢用户
+ps -ef | grep 用户名	查看用户登录终端
+pkill -t 终端	结束终端
+
+-------------------------------------------------------------------------
+c中的时间类型和一些操作（跨平台）
+time_t	tm
+
+
+-------------------------------------------------------------------------
+Kerberos流程
+
+client ---> Authentication Server					msg[ UserName ]
+
+Authentication Server ---> client					msg[ <{ClientTGSKey}*UserPassword>, <{client_id, client_addr, token_valid_time, ClientTGSKey}*TGSKey> = TicketTGS ]
+
+client ---> Ticket Granting Server(TGS)   msg[ {TicketTGS, AskServiceId}, <{client_id, time_stamp_0}*ClientTGSKey> = Auth_C_TGS ]
+
+Ticket Granting Server(TGS) ---> client		msg[ <{client_id, client_addr, token_valid_time}*SSKey> = TicketSS, <{ClientSSKey}*ClientTGSKey> ]
+
+client ---> Service Server (SS)						msg[ TicketSS, <{client_id, time_stamp_1})*ClientSSKey> = Auth_C_SS ]
+
+Service Server (SS) ---> client						msg[ <(time_stamp + 1)*ClientSSKey> = AGREE_SERVICE ]
+
+-------------------------------------------------------------------------
+compose 与 aggregate 的区别 --我的 UML 1 compose :  ◆--------  组成关系  例如：书◆-------文章
+aggregate : ◇-------- 聚合关系  例如：读者◇---- 书 
+
+
+-------------------------------------------------------------------------
+raknet安装:
+../configure --prefix=/usr/local/RakNet --disable-shared 
+编译步骤：
+创建build符合链接,位于/usr/share/libtool/libltdl
+1. autoheader
+2. aclocal
+3. autoconf
+4. automake --add-missing来产生Makefile.in （要先执行 ln -s /usr/share/libtool/config autotools/build）
+5. ./configure --prefix=/usr/local/RakNet3.719 --disable-shared --enable-static --disable-rakvoice --disable-autopatcher
+6. make
+
+-------------------------------------------------------------------------
+sftp无需密码登陆
+客户端 ssh-keygen -t rsa 在~/.ssh目录下生成id_rsa和id_rsa.pub
+id_rsa.pub内容添加到远程服务器/home/ftpuser/.ssh/authorized_keys下
+远程sshd服务必须要开启	PubkeyAuthentication 验证
+这样客户端就可以用 sftp ftpuser@host filename 直接获取文件了
+
+-------------------------------------------------------------------------
+df -lh 指令查看linux硬盘空间和使用情况(已挂载)
+fdisk -l 查看整个硬盘的使用情况
+-------------------------------------------------------------------------
+linux快捷键
+Ctrl + a 切换到命令行开始
+Ctrl + e 切换到命令行末尾
+Ctrl + u 清除剪切光标之前的内容
+Ctrl + k 剪切清除光标之后的内容
+Ctrl + y 粘贴刚才所删除的字符
+Ctrl + r 在历史命令中查找
+Ctrl + d 退出shell，logout
+Ctrl + z 转入后台运行 （或者在命令行后面加个 &），终端退出后该进程会停止运行
+
+-------------------------------------------------------------------------
+linux退出终端仍然继续后台运行程序的方法
+nohup	command	&
+
+-------------------------------------------------------------------------
+通过http协议下载
+wget -O outputfile url
+
+-------------------------------------------------------------------------
+mysql的配置文件及读取顺序
+/etc/my.cnf
+/etc/mysql/my.cnf
+$install_dir/etc/my.cnf
+$basedir/my.cnf 需要在其之前指定basedir或者使用缺省
+$datadir/my.cnf	需要在其之前指定basedir和datadir或者使用缺省
+~/.my.cnf
+
+-------------------------------------------------------------------------
+c++指定结构体的变量对齐方式
+#pragma pack( push,1 )
+#pragma pack( pop )
+
+-------------------------------------------------------------------------
+netcat使用方法
+开端口 nc -lnvv 8888
+连接远程端口 nc -nvv host_ip 8888
+选项 -u表示udp模式
+
+
+-------------------------------------------------------------------------
+new的重载
+	三种new:	
+		1、new操作符，不允许重载，包含分配内存的operator new和对象构造函数，调用形式  X* pX = new X;
+		2、operator new，允许重载，分配指定大小的内存
+				函数形式	void* operator new(size_t size ...)	可以指定多个参数
+				可以直接调用，调用形式 void* p = operator new(size)
+				也可以通过 1 来调用，形式	X* pX = new (除size之外的参数列表)X
+				对指定对象重载operator new时要声明成对象的静态函数
+		3、placement new，在一块指定的内存上使用构造函数，调用形式	X* pX = new (pointer)X;
+				placement new可以通过重载operator new来实现
+		
+	new的错误处理：
+		void (*new_handler)(void)
+		set_new_handler(new_handler)
+		
+		
+-------------------------------------------------------------------------
+mysql查询tips
+join语法
+select * from t1 <inner|cross|left|right| full outer> join t2 <where|on> ...
+	1、inner join	只连接满足条件的
+	2、cross join	条件无效，笛卡尔乘积
+	3、left join	满足条件的和左边表独有的
+	4、right join	满足条件的和右边表独有的
+	5、full outer join	满足条件的和两边独有的
+时间间隔求值
+	time_to_sec(timediff(time1, time2))
+	
+	from_unixtime(floor(UNIX_TIMESTAMP(logtime)/300)*300)
+	
+-------------------------------------------------------------------------
+查看到远程主机的路由跳点
+windows tracert <ip>
+linux		traceroute <ip>
+
+-------------------------------------------------------------------------
+suse linux 静态路由设置
+vi /etc/sysconfig/network/routes
+targetIp routeIp mask device
+如
+10.10.0.0 192.168.1.3	255.255.0.0 eth0 表示到目标地址10.10.*.*的网络包都由路由192.168.1.3转发
+
+-------------------------------------------------------------------------
+ubuntu grub2
+主配置文件 /boot/grub/grub.cfg 自动生成，不能修改
+/etc/default/grub
+/etc/grub.d/*
+上面这些文件是设置grub.cfg的。修改后用update-grub更新grub.cfg
+
+grub-install [--root-directory=...] 
+
+grub命令模式下启动方式：
+ls -l	//查看可用设备
+root (device)	//设置设备root
+linux (bootdevice)/vmlinuz... root=UUID=...	//加载linux内核，其中root的设备UUID可以用 cat (rootdevice)/etc/fstab 来查询
+initrd (bootdevice)/initrd...	//那啥，反正要这个
+boot	//启动系统
+
+-------------------------------------------------------------------------
+关于linux中文显示
+export LANG=zh_CN.utf8 或者 LC_ALL=zh_CN.utf8
+如果还没有zh_CN.utf8，需要修改配置后，执行locale-gen来生成。通过man locale-gen来查看手册。
+
+
+-------------------------------------------------------------------------
+centos
+软件包管理yum
+yum check-update
+yum -y install ... 详细使用方法略，参看yum --help
+
+网络设置
+/etc/sysconfig/network-scripts/ifcfg-eth[0-9]
+
+防火墙相关
+service iptables status //查看防火墙状态
+service iptables {stop|start|restart|save}
+/etc/init.d/iptables status
+
+开启指定端口
+/sbin/iptables -I INPUT -p tcp --dport 8080 -j ACCEPT
+/etc/rc.d/init.d/iptables save
+或者
+编辑/etc/sysconfig/iptables添加行：
+-A RH-Firewall-1-INPUT -m state –state NEW -m tcp -p tcp –dport 8080 -j ACCEPT #也可使用-I INPUT -p tcp --dport 8080 -j ACCEPT
+使更改的防火墙生效
+/etc/init.d/iptables restart #不推荐使用重启系统方式
+关闭防火墙服务
+/etc/init.d/iptables stop
+
+永久关闭防火墙
+chkconfig –level 35 iptables off #此方法源自网络，未实验
+
+-------------------------------------------------------------------------
+linux 程序段错误时处理方法
+默认情况下会自动生成core dump。如果执行路径下没有core文件，检查
+ulimit -c 看值是不是0（表示禁用了core dump），执行 ulimit -c n 来设置core文件大小。
+gdb execute core来看core dump
+
+-------------------------------------------------------------------------
+dpkg 软件包管理
+
+dpkg -L xxx				//查看某软件包安装内容
+dpkg -l					//查看已安装软件包
+apt-cache stats 		//显示软件包的统计信息
+apt-cache show xxx		//显示某软件包的详细信息
+apt-file search xxx		//查看某文件属于哪个包
+apt-cache depends xxx	//查询某软件依赖哪些软件包
+apt-cache rdepends xxx	//查询某软件被哪些软件包依赖
+sudo apt-cdrom add		//增加一个光盘源
+
+dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P    //清除所有已删除软件包的残馀配置文件
+
+ls /var/cache/apt/archives		//查看安装软件时下载软件包的临时存放目录
+
+dpkg --get-selections | grep -v deinstall > ~/somefile	//备份当前系统安装的所有软件包的列表
+
+dpkg --set-selections < ~/somefile
+sudo dselect
+//从上面备份的安装包的列表文件恢复所有包
+
+-------------------------------------------------------------------------
+ngix php mysql 编译和配置
+
+-------------------------------------------------------------------------
+iis php mysql 配置
+
+-------------------------------------------------------------------------
+linux core dump	整理
+ulimit -c filesize 配置core dump文件大小
+/proc/sys/kernel/core_uses_pid可以控制core文件的文件名中是否添加pid作为扩展。文件内容为1，表示添加pid作为扩展名，生成的core文件格式为core.xxxx；为0则表示生成的core文件统一命名为core
+proc/sys/kernel/core_pattern可以控制core文件保存位置和文件名格式
+（
+	echo "/corefile-dir/core-%e-%p-%s-%t" > core_pattern 修改	（注意程序要有目录写权限）
+	%u - insert current uid into filename 添加当前uid
+	%g - insert current gid into filename 添加当前gid
+	%s - insert signal that caused the coredump into the filename
+	%t - insert UNIX time that the coredump occurred into filename
+	%h - insert hostname where the coredump happened into filename
+	%e - insert coredumping executable name into filename
+）
+gdb [exec file] [core file]	调试core文件
+-------------------------------------------------------------------------
+iptables
+iptables -A INPUT -p tcp --dport 9999 -s 111.222.33.44 -j ACCEPT
+(centos: vi /etc/sysconfig/iptables  & service iptables restart)
+-------------------------------------------------------------------------
+route
+route add -net 123.234.0.0 netmask 255.255.0.0 gw 192.168.0.1
+route del -net ...
+-------------------------------------------------------------------------
+mysql 存储过程
+delimiter //
+CREATE PROCEDURE simpleproc (OUT param1 INT)
+begin
+	select count(*) into param1 from t;
+end;
+//
+delimiter ;
+call simpleproc(@a);
+select @a;
+
+show create procedure simpleproc;
+show procedure status;	//显示所有存储过程
+
+游标实例
+create procedure cal_online_num(in start_time timestamp, in end_time timestamp)
+begin
+    DECLARE log_type INT;
+    DECLARE log_time timestamp;
+    DECLARE online_num INT;		/*变量声明在最前面*/
+    DECLARE Done int DEFAULT 0;
+    DECLARE rs CURSOR FOR select logtype, logtime from TLog where (logtype=1 or logtype=2) and logtime>start_time and logtime<end_time order by logtime; /*游标声明*/
+    DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET Done = 1; /*错误handler*/
+	/*declare语句的顺序不能变！*/
+	drop table if exists online_num_list;
+    create table online_num_list (num int, num_time timestamp not null);
+    set online_num=0;
+    OPEN rs;  
+    FETCH NEXT FROM rs INTO log_type, log_time;
+    REPEAT
+        IF NOT Done THEN
+        if log_type=1 then
+            set online_num = online_num + 1;
+        else
+            set online_num = online_num - 1;
+        end if;
+        insert into online_num_list values (online_num, log_time);
+        end if;       
+        FETCH NEXT FROM rs INTO log_type, log_time;
+    UNTIL Done END REPEAT;
+    CLOSE rs;
+end
+-------------------------------------------------------------------------
+查看gcc预定义宏
+cpp -dM /dev/null
+-------------------------------------------------------------------------
+socket编程相关--指定网卡发送数据
+struct sockaddr_in localAddr;
+socklen_t addrlen;
+getsockname(s, (struct sockaddr*)&localAddr, &addrlen);
+unsigned long addr = localAddr.sin_addr.s_addr;//binaryAddress;
+setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, (char *)&addr, sizeof(addr));
+-------------------------------------------------------------------------
+mysql 相关  环境变量查询和设置
+show global variables [like ...];
+show session variables [like ...];		//global变量和session变量的区别：session变量只对设置该变量的连接起作用，其他连接仍然使用global变量的值
+
+SET variable_assignment [, variable_assignment] ...
+variable_assignment:
+      user_var_name = expr
+    | [GLOBAL | SESSION] system_var_name = expr
+    | [@@global. | @@session. | @@]system_var_name = expr
+-------------------------------------------------------------------------
+linux跳转
+#include <setjmp.h>
+int setjmp(jmp_buf env);						//设置当前跳转环境
+int sigsetjmp(sigjmp_buf env, int savesigs);	//设置当前跳转环境（存储信号相关环境）
+void longjmp(jmp_buf env, int val);				//跳转到env指定的环境,val指定setjmp的返回值
+void siglongjmp(sigjmp_buf env, int val);		//跳转到env指定的环境,val指定setjmp的返回值
+
+-------------------------------------------------------------------------
+
+gdb基本命令 (from internet)
+ 
+不要忘了gcc编译时要加 -g 参数， 基本gdb命令 档案处理
+========
+file a.out                 载入可执行文件a.out
+path                       告诉gdb obj code在那
+directory                  告诉gdb source code在那里
+
+SHELL
+=====
+shell cmd				  执行shell指令                   
+cd xxx   				  设置工作路径                  
+
+断点(Break point and watch point)处理
+=======================================
+break                      设定断点 
+clear                      清除断点
+delete                     清除断点
+disable                    暂时使中断无作用
+enable                     使中断再作用
+condition                  进一步设断点的条件 如果条件为true则中断
+commands                   如果中断了则执行commands与end中的一连串gdb命令
+.....
+end
+      
+其中 断点可以用source code的行数来代表(这些信息藏在ELF格式 里的.line这个section里)，也可以用断点的流水号来表示 br                         在目前位置设断点
+br 100                     在100行中断
+br func1                   在func1中断
+br +100                    目前位置+100行中断
+br *0x08048123             在这地址中断
+br file.c:100              因为如果是多个c档案时指定file.c
+tbreak                     同break的写法 不过中断一次后 此断点就失效
+br 100 if (var == 5)       条件中断 后面跟着c语法的条件判断式
+br 100                     在第100行中断并且执行command...end中的gdb命令
+commands
+  silent
+  printf "x is %d\n",x
+end
+break String::func1        C++ Function Overloading的中断 String是class
+
+clear 100                  清除断点  后面跟着行号或函数名
+clear func1
+
+delete 5                   清除5号断点  后面是断点流水编号
+disable 3                  暂时使3号断点没作用  后面是断点流水编号
+enable 2                   使2号断点作用  后面是断点流水编号
+
+condition 3 (var > 3)      设3号断点的条件 如果条件为true则中断
+condition 3                清除3号断点的条件
+
+程序执行
+========
+set args xxx               给执行程序参数xxx，就是main里的**argv            
+run                        开始跑程序
+continue                   中断后继续跑
+next                       往下跳一步c程序 如果有子程序 执行完整个子程序
+step                       往下跳一步c程序 如果有子程序 追进子程序
+until                      跳离一个while for循环
+nexti                      往下一步CPU组语的指令(Instruction)执行完整个子程序
+stepi                      往下一步CPU组语的指令(Instruction)追进子程序
+until                      执行到source code的行数比目前的大
+                           如果目前所在行是loop的最后一行就会跳离loop
+
+程序变量值(data)处理
+====================
+print var                  看var的值
+print &var             印出var的地址(其时这就是C 啦)
+print *var                 印出*var值 var是pointer
+display var                display会每次step, next时都会印出值来,print只印一次
+print (var=value)          设var的值为value
+                           其实print 可以只用p代替 很多指令都可以简写代替
+p/x                        /x表示印hex值
+                           /u表示unsigned digit
+                           /d    signed digit
+                           /t    二进制值
+                           
+                           /是打印的选项 在Solaris上的adb也有相似形式
+x/3uh 0x8048012            印出内存
+                           其中
+                           3表示看3个
+                           u      unsigned digit(跟上面p命令一样意义) 
+                           h      halfword就是2bytes(bhwg分别是1248bytes)
+
+GDB内定变量(跟程序变量不一样喔)
+===============================
+一些gdb方便的变量(convenience variable)
+$_                         用x命令所得到的最后一个地址
+$__                        用x命令所得到的最后一个地址的值
+$_exitcode                 程序离开的code就是用exit时的code
+
+CPU缓存器(registers)
+$pc                        program counter就是目前cpu指到的执行位置啦
+$sp                        stack pointer
+
+讯息观看与设定
+==============
+info                       得到一些program debug信息
+                           info break
+                           info frame
+                           info display
+
+                           info program
+                           info share
+                           info registers
+                           
+show                       得到一些系统(OS, CPU Arch), GDB信息
+                           show args       (系统传进来的argv[0],argv[1]...)
+                           show os         (OS是什么)
+                           show endian
+                           show prompt     (gdb的提示符号)
+
+list                       看原始码
+                           list x  从第x行的source code印出，x不写从目前行印出
+						   list *addr  秀出addr所在source code的行
+                                       可以先用info program找出目前PC的值
+                                       再用list *addr
+                           search REGEXP 在目前source code做RE搜寻
+
+disas                      想看machine code用这个
+
+whatis var                 告诉我var的数据型别是啥 int, char or double
+ptype var                  告诉我var的数据型别是啥 这用来看struct用的
+
+set                        设定gdb, 系统的控制变量值(这些变量不是program内的)
+                           set listsize xx  设定要看xx行source code
+                           set $pc xx       把PC设到 xx
+                           set convenience可以自己设变量
+
+help                       可以得到命令HELP
+
+程序与子程序(process and sub-function)
+======================================
+backtrace(bt)2             程序执行到这里前的两个子程序，2不写则列出全部
+frame        2             选择2号frame跳过去  2不写就列出现在执行到那里
+up           2             往上走2个子程序
+down         3             往下走2个子程序
+return       expression    不要玩了,回到上一层呼叫的routine去并return一个值
+finish                     继续玩完一个选择的stack frame(子程序)
+
+kill                       砍掉child process
+signal       signal_id     送signal给process
+attach       procss-id     debug一个已经在内存跑的process
+detach       procss-id     释放attach的process脱离gdb的控制      
+ 
+其中每次程序呼叫子程序时， 原本的执行的世界的东西(变量值啊等等)必需先保存起来， 然后再跳到新世界(将要执行的子程序)这就是stack， 每叫一个sub routine就等于进到一个stack frame 
+(gdb)frame 2 
+      
+就是选择2号frame，而0号frame就是目前在执行的子程序， 1号是呼叫0号的子程序，以此类推， finish搭配frame这个命令来用 
+
+所以bt这个命令很重要，可以追回之前叫了那些function来到目前的地方。 通常在命令行也有类似的追踪system call的程序，因为system call很重要， 在Solaris上我们可以用 $ truss prog1
+    
+在Linux上 $ strace prog1
+     
+来看现在程序到底叫了甚么system call导致他毁掉。 
+
+attach, detach必需在有支持process 的环境， 因为有的没内存保护OS，或embadded system没有支持， 另外也要有能力送signal给process的环境才行， 这主要可以来debug deamon或做multiprocess的除错
+
+-------------------------------------------------------------------------
+mysql 触发器
+	delimiter //
+	create trigger trig_update_friendinfo 
+	before update 																--//before(after)  update(insert、delete)
+	on TFriendInfo 
+	for each row begin 
+		if old.relationship!=new.relationship then 
+			set new.updatetime=current_timestamp; 
+		end if; 
+	end//
+	delimiter ;
+	
+	SHOW TRIGGERS [FROM db_name] [like_or_where]
+
+-------------------------------------------------------------------------
+win7 sendto目录	C:\users\<username>\AppData\Roaming\Microsoft\Windows\SendTo 
+
+-------------------------------------------------------------------------
+struct sockaddr { 
+　　unsigned short sa_family; /* 地址族， AF_xxx */ 
+　 char sa_data[14]; /* 14 字节的协议地址 */ }; 
+与
+struct sockaddr_in { 
+　　 short int sin_family; /* 地址族 */ 
+　　 unsigned short int sin_port; /* 端口号 */ 
+　　 struct in_addr sin_addr; /* IP地址 */ 
+　　 unsigned char sin_zero[8]; /* 填充0 以保持与struct sockaddr同样大小 */ 
+　　};
+内存相同
+
+htons()-- "Host to Network Short " ; htonl()-- "Host to Network Long " 
+ntohs()-- "Network to Host Short " ; ntohl()-- "Network to Host Long " 
+
+
+-------------------------------------------------------------------------
+mysql innodb 优化数据库整理碎片
+ALTER TABLE tbl_name ENGINE = Innodb;
+
+mysqld启动时自动回复innodb日志文件，修改my.cnf
+innodb_force_recovery = 4
+
+-------------------------------------------------------------------------
+linux 修改系统时间
+date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]
+hwclock -w
+
+-------------------------------------------------------------------------
+ubuntu 修改mysql datadir 除了my.cnf中的设置之外，还需要修改
+/etc/apparmor.d/usr.sbin.mysqld 中指定的权限， 然后重启appmor服务（/etc/init.d/apparmor restart
+）
+
+-------------------------------------------------------------------------
+bash相关
+ wc -w 统计单词数量. 
+ wc -l 统计行数量. 
+ wc -c 统计字节数量. 
+ wc -m 统计字符数量.  
+ wc -L 给出文件中最长行的长度
+ strings	输出文件可打印字符
+ test 文件测试符：
+	-e   文件存在
+	-s   文件长度不为 0 
+	-d   文件是个目录
+	-r   文件具有读权限(对于用户运行这个 test) 
+	-w   文件具有写权限(对于用户运行这个 test) 
+	-x   文件具有执行权限(对于用户运行这个 test)
+	f1 -nt f2 
+		文件 f1比 f2新 
+	f1 -ot f2 
+		f1 比f2 老 
+	f1 -ef f2 
+		f1 和f2 都硬连接到同一个文件. 
+	-O   你是文件的所有者. 
+	-G   文件的 group-id 和你的相同. 
+	-N   从文件最后被阅读到现在,是否被修改. 
+
+  0 is true
+  1 is true
+  -1 is true
+  Random string is true
+  "" is false
+  NULL variable is false
+  Uninialized variable is false
+  "false" is true. 
+  false is true. 
+  "$false" is false.
+  $false is true. 
+	
+-------------------------------------------------------------------------	
+vim -b <filename>    //二进制方式打开文件
+:%!xxd -g 1			//切换到16禁止编辑方式（编辑后必须恢复二进制来保存）
+:%!xxd -r			//恢复2进制
+
+vim -bd <file1> <file2>		//二进制方式比较文件
+[+c (]+c)  查找上一个（下一个）不同点
+
+-------------------------------------------------------------------------	
+linux 动态库路径搜索方式（按优先级排列）
+1、编译目标代码时指定的动态库搜索路径（例如 -Wl,-rpath,./）
+2、环境变量LD_LIBRARY_PATH指定的路径（用:分开）
+3、配置文件/etc/ld.so.conf指定的路径（必须运行命令ldconfig使修改后的配置生效）
+4、默认搜索路径/lib
+5、默认搜索路径/usr/lib
+
+在命令前加环境变量设置，该环境变量只对该命令有效，当该命令执行完成后，该环境变量就无效了。
+
+-------------------------------------------------------------------------	
+设置socket绑定的硬件地址
+	struct sockaddr_in localAddr;
+	socklen_t addrlen;
+	getsockname(s, (struct sockaddr*)&localAddr, &addrlen);	
+	unsigned long addr = localAddr.sin_addr.s_addr;//binaryAddress;
+	setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, (char *)&addr, sizeof(addr));
+
+-------------------------------- 
+静态库生成
+ar crv libXXX.a YYY.o
+动态库生成
+gcc -shared -fPCI -o libXXX.so YYY.o(或者直接用YYY.c)
+
+-------------------------------- 
+查找函数所在的库文件
+1、利用grep找到包含函数的头文件
+2、rpm -qa --filesbypkg | grep <filename> 找到包含该文件的包
+3、rpm -qa --filesbypkg <packagename> | grep \.a$ | awk '{print $2}' | xargs grep <function> 找到包中包含函数的*.a文件
+
+-------------------------------- 
+linux打包加解密指令
+压缩 + 加密
+tar -czf - <path> | openssl des3 -salt -k "<passwd>" -out <cryptpacket>
+解密 + 解压
+openssl des3 -d -k "<passwd>" -salt -in <cryptpacket> | tar zxf -
+
+-------------------------------- 
+vim中的encoding,fileencoding,fileencodings
+encoding 当前编辑中使用的编码，从$LANG中获取或者是latin1
+fileencoding 文件的编码。vim打开文件时会将文件从fileencoding转化到encoding来显示和编辑，保存时再转化回去
+fileencodings 通常在.vimrc中设置如 set fileencodings=gbk,utf-8 vim打开文件时按照顺序自动选择其中的一个作为fileencoding。
+:set fileencoding  查看当前文件编码
+:set fileencoding=utf-8 将文件从当前编码转化到utf-8编码
+:edit ++end=gbk  使用gbk编码重新加载文件
+bash下转化编码  iconv -f gbk -t utf8 file1 -o file2
+bash下批量转化编码  find . -name '*.txt' -exec iconv -f gbk -t utf8 {} -o tmp.txt \; -exec mv tmp.txt {} \;
+
+-------------------------------- 
+mysql主从配置流程
+主 grant replication slave *.* on slave_user@<ip> identified by 'slave_pass';
+主 my.cnf 可选配置项 binlog-do-db = <dbname> 多行配置多个数据库
+mysql>flush tables with read lock;
+shell>mysqldump ... > dumpfile.sql
+show master status\G;	得到log_file和log_pos
+
+副 my.cnf 可选配置项 replicate-do-db = <dbname> 多行配置多个数据库
+mysql>stop slave;
+mysql>source dumpfile.sql;
+mysql>change master to master_host=<host>, master_user=<user>, master_password=<password>, master_log_file = <log_file>, master_log_pos=<log_pos>
+
+主 unlock tables;
+副 start slave;
+
+-------------------------------- 
+linux 共享内存查询及清除
+ipcs -m | grep <username> | awk '{print $2}' | xargs -i ipcrm -m {}
+
+-------------------------------- 
+centos修改hostname
+修改 /etc/sysconfig/network 修改hostname的值
+如果不重启，须执行 hostname <newhostname>来修改
+
+-------------------------------- 
+修改分区大小的方法（例如/dev/sda5 mount 在/home）
+umount /dev/sda5
+
+
+
+-------------------------------- 
+修改var挂接点的方法
+
+-------------------------------- 
+修改var挂接点后selinux导致若干服务失败的问题
+
+-------------------------------- 
+fstab改错之后fstab只读无法修改的解决：
+mount -o remount,rw /dev/sda2 / -t ext3
+
+-------------------------------- 
+tcp通信优化，可能需要修改的一些选项 /etc/sysctl.conf
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_synack_retries = 2
+net.ipv4.tcp_syn_retries = 2
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_tw_recycle = 1
+net.inet.tcp.msl = 2000		//freebsd
+net.inet.tcp.always_keepalive = 0
+
+-------------------------------- 
+/proc/sys/kernel/shmmax，这个文件控制着进程可以使用共享内存的大小
+
+-------------------------------- 
+//单IP并发连接数限制和单IP单位时间新建连接数限制
+#单IP并发连接最多60
+-A INPUT -p tcp --syn --dport 6900 -m connlimit --connlimit-above 60 -j REJECT
+#60秒内单IP最多发起20次连接，超过则60秒内拒绝该IP新建连接
+-A INPUT -p tcp --dport 6900 -m state --state NEW -m recent --set --name DOS
+-A INPUT -p tcp --dport 6900 -m state --state NEW -m recent --update --seconds 60 --hitcount 20 --name DOS -j DROP
+
+-------------------------------- 
+单网卡dhcp服务器配置（ubuntu）
+1、网卡添加一个ip地址 ifconfig eth0:0 192.168.131.254	作为网关
+2、允许转发 echo "1" > /proc/sys/net/ipv4/ip_forward
+3、防火墙nat策略添加 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+----上述3步实现一个网关配置，客户端可以将131.254作为网关地址，下面是dhcp配置
+4、安装dhcp服务器dhcp3-server，修改配置/etc/dhcp3/dhcpd.conf
+	subnet 192.168.131.0 netmask 255.255.255.0 {
+	  range 192.168.131.1 192.168.131.250;
+	  option routers 192.168.131.254;
+	  option broadcast-address 192.168.131.255;
+	  option domain-name "ubuntu-g2.com";
+	  option subnet-mask 255.255.255.0;
+	  option domain-name-servers 192.168.1.1;
+	  option netbios-name-servers 192.168.1.1;
+	  default-lease-time 600;
+	  max-lease-time 7200;
+	}
+	，（可选：修改配置/etc/default/dhcp3-server  INTERFACES="eth0"）
+	
+5、启动dhcp服务器 service dhcp3-server start
+
+-------------------------------- 
+网络安装系统
+
+
+-------------------------------- 
+mysql bin log
+配置   my.cnf  log_bin=logfile	开启二进制日志
+从二进制日志恢复   mysqlbinlog logfile | mysql -uroot
+
+-------------------------------- 
+修改文件句柄数
+ulimit -n <num>
+系统限制
+/etc/security/limits.conf    添加 
+	<user> soft nofile <num>  #其中<user>为*表示所有用户
+	<user> hard nofile <num>  #其中<user>为*表示所有用户
+		
+-------------------------------- 
+gprof 心得
+程序如果不是从main return或exit()退出，则可能不生成gmon.out。
+export GMON_OUT_PREFIX=x.out 则之后生成的文件名就如x.out.pid，多进程的gmon.out就不会相互覆盖。
+
+--------------------------------
+http://www.yolinux.com/TUTORIALS/src/dbinit_stl_views-1.03.txt   gdb 查看stl容器的定义脚本，添加到~/.gdbinit中去
+gdb类型转换时，如果是带namespace的需要加单引号，如 p *('IOD::IPacket'*)0x123456
+
+--------------------------------
+mysql 查询数据库的外键
+select concat(table_name, '.', column_name) as 'foreign key',concat(referenced_table_name, '.', referenced_column_name) as 'references' from information_schema.key_column_usage where table_schema='xfire' and referenced_table_name is not null;
+
+--------------------------------
+linux当前目录下文件/文件夹大小排序
+du -sh * | sort -n
+
+	sh/sk/sm 的区别：
+　　	sh 根据文件大小显示为nK/nM/nG  eg.  [4.0K    xxx.log]
+	　　sk 根据文件大小显示为nK             eg.  [4.3K    xxx.log]
+	　　sm 根据文件大小显示为nM            eg.  [7M      xxx.log]
+
+-------------------------------
+INSERT...ON DUPLICATE KEY UPDATE 语法
+CASE value WHEN [compare-value] THEN result [WHEN [compare-value] THEN result ...] [ELSE result] END 语法
+CASE WHEN [condition] THEN result [WHEN [condition] THEN result ...] [ELSE result] END 语法
+insert TItemInfo set roleid=(select roleid from TRoleInfo where playername='神殇之战0'), ItemId=2688552962, Amount=0xffffffff, RevisedValue=0, PeriodOfValidity=1036800, State=0 
+ON DUPLICATE KEY UPDATE PeriodOfValidity=case when unix_timestamp(current_timestamp)<PeriodOfValidity+unix_timestamp(ProvidedTime) then PeriodOfValidity+1036800 else unix_timestamp(current_timestamp)-unix_timestamp(ProvidedTime)+1036800 end;
+
+IF (expr1, expr2, expr3) 语法
+select (1, 2, 3); (2)
+
+-------------------------------
+挂载windows共享目录的方法
+mount -t cifs -o username=administrator,password=123456 192.168.1.20:Download /mnt/share
+
+-------------------------------
+访问共享文件时，第一次会提示输入用户名和密码，以后再访问时就不需要了。
+当我们需要更换用户名登陆时，怎么办呢？注销也许是一种办法，那么有没有不注销就可以的简单些的办法呢？
+使用以下命令可以做到:
+1.删除默认用户名登陆：
+net use \\ip或计算机名 /delete
+2.选定某个用户名登陆：
+net use \\ip或计算机名 /user:用户名
+3.提示“不能多用户连接”：
+net use * /del /y
+
+-------------------------------
+1、gdb生成进程内存快照 gcore
+2、强制生成dump：发送SIGQUIT，SIGABRT, SIGFPE和SIGSEGV等信号
+
+-------------------------------
+gdb fork
+set follow-fork-mode [parent|child]
+
+-------------------------------
+ext2测试
+dd if=/dev/zero of=fs count=256 bs=4k		//从/dev/zero拷贝256*4k到文件fs
+mke2fs fs			//将fs文件格式化为一个文件系统
+dumpe2fs fs			//查看文件系统信息
+mount -o loop fs /mnt/e2fstest		//挂载文件系统
+可以进入/mnt/e2fstest进行操作
+umount /mnt/e2fstest
+od -tx1 -Ax fs		//查看文件系统二进制信息
+
+-------------------------------
+linux 链接、动态库、静态库相关
+-Wl,dn -lxx		强制静态链接指定库
+-Wl,dy -lxx		强制动态链接指定库
+--static		缺省静态链接（没有指定的都是静态链接；不推荐，会导致底层库都静态链接，不利于移植）
+
+-------------------------------
+mount.cifs出现无法分配内存问题解决方法
+设置：“HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\LargeSystemCache” 为 “1″. DWORD
+设置：“HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\Size” 为 “3″.
+重启: Server 服务即可。
+
+-------------------------------
+mysql 事物隔离级别相关
+
+READ COMMITTED
+READ UNCOMMITTED
+REPEATABLE READ
+SERIALIZABLE
+
+SELECT @@global.tx_isolation; (global isolation level)
+SELECT @@tx_isolation; (session isolation level)
+SET GLOBAL TRANSACTION ISOLATION LEVEL READ UNCOMMITTED ;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ
+
+详见：
+http://itecsoftware.com/with-nolock-table-hint-equivalent-for-mysql
+
+-------------------------------
+git
+设置用户：
+	git config --global user.name "Your Name"
+	git config --global user.email "your_email@whatever.com"
+	
+	#linux:
+	#git config --global core.autocrlf input
+	#git config --global core.safecrlf true
+	#winows:
+	#git config --global core.autocrlf true
+	#git config --global core.safecrlf true
+	
+windows设置editor:
+	git config --global core.editor "/npp.sh"
+	
+	其中git根目录下npp.sh内容如下：	
+	#!/bin/sh
+	"C:/Program Files (x86)/Notepad++/notepad++.exe" -multiInst -notabbar -nosession -noPlugin "$*"	
+	
+创建repository:
+	mkdir hello
+	cd hello
+	git init
+	
+添加文件：
+	git add <filename>
+	git commit -m <comment>  （没有-m参数则调用core.editor设置的编辑器编辑注释）
+	
+查看状态：
+	git status
+	
+获取分支（将会覆盖本地文件）：
+	git checkout <commit-hash | tag | branch>
+
+回滚上一个版本：
+	git revert HEAD [--no-edit]
+	#未标记的revert操作，如果被回滚，该操作记录将不保留
+	
+取消本地文件staged状态：
+	git reset HEAD <filename>
+		
+回滚之前的版本：
+	git reset --hard <commit-hash | tag | branch>
+	
+删除标记：
+	git tag -d <tagname>
+	
+覆盖上次commit(修改注释):
+	git commit --amend -m "Add an author/email comment"
+	
+移动文件：
+	git mv <src> <target>
+	或者：
+	git add <targetfile>
+	git rm <srcfile>
+	
+merge和rabase：
+	git merge <branch>
+	git rabase <branch>
+	两者的区别在于，rebase会把合并分支的更新记录也迁移到当前分支，使分支历史可读性更高。如果当前分支是公共的，不要使用rebase；如果当前分支修改历史很重要，也不要rebase。
+	
+clone：
+	cd ..
+	git clone <repos-name> <target_repos_name>
+	cd target_repos_name
+	git remote show orgine
+	git branch -a
+	
+	git fetch		#得到主分支所有更新，但没有合并到本地
+	git merge origin/master	#合并
+	(上面两条指令可以用git pull代替)
+	
+log：
+	git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=iso
+	git log --all --pretty=format:"%h %cd %s (%an)" --since='7 days ago'
+	git log --pretty=oneline --max-count=2
+	git log --pretty=oneline --author=<your name>
+	
+	# --pretty="..." defines the output format.
+	# %h is the abbreviated hash of the commit
+	# %d commit decorations (e.g. branch heads or tags)
+	# %ad is the commit date
+	# %s is the comment
+	# %an is the name of the author
+	# --graph tells git to display the commit tree in the form of an ASCII graph layout
+	# --date=short keeps the date format short and nice
+	
+daemon:
+
+	服务端：
+	git daemon --verbose --export-all --base-path=.
+	
+	客户端：
+	git clone git://localhost/hello.git network_hello
+	
+bare git:
+	服务器：git clone --bare <src-repos> src-repos.git
+			cd src-repos
+			git remote add <shared-repos-name> ../src-repos.git
+			git pull <shared-repos-name> <to-merge-branch-name>
+			git push <shared-repos-name> <branch-name-merge-to>
+			
+	客户端：mkdir src-repos
+			cd src-repos
+			git remote add <shared-repos-name> ssh://user@serverip/src-repos.git
+			git pull <shared-repos-name> <to-merge-branch-name>
+			git push <shared-repos-name> <branch-name-merge-to>
+			
+-----------------------------------------------------------------------
+zypper相关：suse linux下使用的包管理软件
+查看源：zypper lr
+删除源：zypper rr "Updates for openSUSE 11.3 11.3-1.82"
+添加源：zypper ar "http://debian.ustc.edu.cn/opensuse/distribution/11.4/repo/oss/" "ustc-11.4-oss"
+		zypper ar "http://debian.ustc.edu.cn/opensuse/distribution/11.4/repo/non-oss/" "ustc-11.4-non-oss"
+安装：zypper insall <pkgname>
+
+-----------------------------------------------------------------------
+vimdiff
+do (:diffget)	从另一边获得当前块
+dp (:diffput)	将当前块替换到另一边
+ctrl+w w		切换窗口
+:diffupdate		重新比较
+zo、zc			打开折叠和重新折叠
+[c、]c			跳转到上（下）一个diff处
+:vertical diffsplit <right-file> 将当前文件与right-file比较，左右分屏
+
+-----------------------------------------------------------------------
+vim进阶操作
+块操作： <C-v>(windows下是<C-q>) 进入块操作模式  选择相应的行  执行相应操作（I插入、A添加...） ESC
+v选择模式：vi" 选择当前所在引号内的内容   va"选择当前所在引号的内容包含引号   v2a) 选择当前所在两层括号内容含括号字符
+选择多行，=自动给缩进
+fs 跳转到当前行下一个s字符  	3fs 跳转到当前行当前位置后第三个s处    ts跳转到当前行下一个s前一个位置    F、T反方向跳转
+<C-n>或<C-p>自动补齐
+q[x]操作q 记录操作[到x]  @x @@重复记录操作
+:split  :vsplit 分屏
+gg=G 全体自动缩进
+gu  gU 大小写转换
+gd gD 高亮当前单词，跳转到局部变量定义处
+[[ [{ [( 跳转到block开头处
+:grep "keywords" ./* 生成当前目录下含有keywords的文件位置列表  :cn  :cp 跨文件跳转到该位置
+:tabnew <filename>  在新标签页打开文件
+[n]gt [n]gT 切换标签
+:tabdo {cmd}  相当于：   :tabfirst<cr>   :cmd<cr>   :tabnext<cr> ...
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+标准C语言头文件
+
+ISO C标准定义的头文件(24项)
+
+<assert.h> 验证程序断言       <complex.h> 支持复数算术运算(C99)      <ctype.h> 字符类型
+
+<errno.h> 出错码             <fenv.h> 浮点环境(c99)                <float.h> 浮点常量
+
+<inttypes.h> 整型格式转换(c99)     <iso646.h> 替代关系操作符宏        <limits.h> 实现常量
+
+<locale.h> 局部类别          <math.h> 数学常量                <setjmp.h> 非局部goto
+
+<signal.h> 信号              <stdarg.h> 可变参数表            <stdbool.h> 布尔类型和值(c99)
+
+<stddef.h> 标准定义          <stdint.h> 整型(c99)                  <stdio.h> 标准I/O库
+
+<stdlib.h> 实用程序库函数     <string.h> 字符串操作            <tgmath.h> 通用类型数学宏(c99)
+
+<time.h> 时间和日期          <wchar.h> 宽字符支持             <wctype.h> 宽字符分类和映射支持
+
+POSIX标准定义的必须的头文件(26项)
+
+<dirent.h> 目录项            <fcntl.h> 文件控制               <fnmatch.h> 文件名匹配类型
+
+<glob.h> 路径名模式匹配类型    <grp.h> 组文件                   <netdb.h> 网络数据库操作
+
+<pwd.h> 口令文件             <regex.h> 正则表达式             <tar.h> tar归档值
+
+<termios.h> 终端I/O         <unistd.h> 符号常量              <utime.h> 文件时间
+
+<wordexp.h> 字扩展类型       <arpa/inet.h> Internet定义      <net/if.h> 套接字本地接口
+
+<netinet/in.h> Internet地址族 <netinet/tcp.h> 传输控制协议 <sys/mman.h> 内存管理声明
+
+<sys/select.h> select函数   <sys/socket.h> 套接字接口    <sys/stat.h> 文件状态
+
+<sys/times.h> 进程时间       <sys/types.h> 基本系统数据类型 <sys/un.h> UNIX域套接字定义
+
+<sys/utsname.h>系统名        <sys/wait.h> 进程控制
+
+POSIX标准定义的XSI扩展头文件(26项)
+
+<cpio.h> cpio归档值         <dlfcn.h> 动态链接               <fmtmsg.h> 消息显示结构
+
+<ftw.h> 文件树漫游           <iconv.h> 代码集转换实用程序       <langinfo.h> 语言信息常量
+
+<libgen.h> 模式匹配函数定义   <monetary.h> 货币类型            <ndbm.h> 数据库操作
+
+<nl_types.h> 消息类别        <poll.h> 轮询函数                <search.h> 搜索表
+
+<strings.h> 字符串操作       <syslog.h> 系统出错日志记录       <ucontext.h> 用户上下文
+
+<ulimit.h> 用户限制          <utmpx.h> 用户帐户数据库          <sys/ipc.h> IPC
+
+<sys/msg.h> 消息队列         <sys/resource.h> 资源操作    <sys/sem.h> 信号量
+
+<sys/shm.h> 共享存储         <sys/statvfs.h> 文件系统信息      <sys/time.h> 时间类型
+
+<sys/timeb.h> 附加的时间     <sys/uio.h> 矢量I/O操作
+
+POSIX标准定义的可选头文件(8项)
+
+<aio.h> 异步I/O             <mqueue.h> 消息队列              <pthread.h> 线程
+
+<sched.h> 执行调度           <semaphore.h> 信号量             <spawn.h> 实时spawn接口
+
+<stropts.h> XSI STREAMS接口 <trace.h> 时间跟踪
+
+
+
+标准 C++ 语言头文件（54个其中16个用于构建STL,3个为附加非必须）　
+
+<algorithm>　STL通用算法     <bitset> STL位集容器             <cassert> 用于在程序运行时执行断言
+
+<cctype> 字符处理            <cerrno> 错误码                  <cfloat> 用于测试浮点类型属性
+<ciso646> ISO646变体字符集   <climits> 测试整数类型属性    <clocale> 本地化函数
+
+<cmath> 数学函数             <complex>　复数类                <csetjmp> 执行非内部的goto语句
+
+<csignal> 信号               <cstdarg> 访问参数数量变化的函数   <cstddef> 用于定义实用的类型和宏
+
+<cstdio> 输入/输出           <cstdlib> 杂项函数及内存分配       <cstring> 字符串
+
+<ctime> 时间                 <cwchar> 宽字符处理及输入/输出     <cwctype> 宽字符分类
+
+<deque> STL双端队列容器      <exception> 异常处理类            <fstream> 文件流    
+
+<functional> STL函数对象     <iomanip> 参数化输入/输出         <ios>　基本输入/输出支持
+
+<iosfwd> 输入/输出前置声明    <iostream> 数据流输入/输出        <istream> 基本输入流
+
+<iterator> 遍历序列的类       <limits> 各种数据类型最值常量      <list>　STL线性列表容器
+
+<locale> 国际化支持           <map> STL映射容器                <memory> 专用内存分配器
+
+<new> 基本内存分配和释放       <numeric> 通用的数字操作          <ostream> 基本输出流
+
+<queue> STL 队列容器         <set> STL 集合容器               <sstream> 基于字符串的流
+
+<stack> STL 堆栈容器         <stdexcept> 标准异常类            <streambuf> iostream 的缓冲区类
+
+<string> 字符串类            <strstream> 非内存字符序列的流类   <typeinfo>  运行时类型标识
+
+<utility> STL 通用模板类      <valarray> 支持值数组的类和模版类  <vector> STL 动态数组容器
+
+标准C++附加的头文件(3个)非必须
+
+<hash_map>                  <hash_set>                      <slist>
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+gcc(g++)头文件搜索路径：
+1、-I指定路径
+2、C_INCLUDE_PATH,CPLUS_INCLUDE_PATH,OBJC_INCLUDE_PATH 环境变量指定路径
+3、内定路径，包含：
+	/usr/include
+	/usr/local/include
+	/usr/lib/gcc-lib/下的一些头文件路径
+
+
+运行时动态库文件搜索路径：
+1、编译时指定的路径("-Wl,-rpath,")
+2、LD_LIBRARY_PATH
+3、/etc/ld.so.conf
+4、/lib
+5、/usr/lib
